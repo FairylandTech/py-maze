@@ -1,0 +1,6 @@
+### PUBLIC ###
+.idea
+build
+*.rar
+executable
+__pycache__
