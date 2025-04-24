@@ -23,7 +23,7 @@ BOTTOM = 60
 HEIGHT = WIDTH + HEADER + BOTTOM
 WINDOW = (WIDTH, HEIGHT)
 
-TITLE = "Python Project 5th sem"
+TITLE = "迷宫游戏"
 SCREEN = pygame.display.set_mode(WINDOW)
 pygame.display.set_caption(TITLE)
 FPS = 60
@@ -201,6 +201,19 @@ def draw_level_opener(x, y, len, height, text1, img, text2):
 
 
 def draw_end_screen(status, score):
+    """
+    根据游戏状态显示结束画面，并管理活动线程的清理和用户界面交互。
+    和用户界面交互。该功能会根据用户是否成功完成游戏、是否使用了人工智能和是否按了按钮，用适当的图形更新屏幕、标题和按钮。辅助，还是得分为零。
+
+    该函数通过在向前移动前终止活动线程（`TIME_THREAD`）、重置 AI
+    重置人工智能状态，并在需要时更新高分。它还会设置
+    重放游戏或返回菜单的 UI 按钮。
+
+    :param status: 代表游戏状态，它决定了结束屏幕的内容。它支持的值包括 "complete"（成功完成）、"score_0"（失败且得分为零）。
+    :param score: 玩家的最终得分，显示在终点屏幕上，用于更新高分。
+    :type status: str
+    :type score: int
+    """
     global SOLVE_THREAD, TIME_THREAD, AI
 
     if TIME_THREAD is not None and TIME_THREAD.is_alive():
@@ -317,6 +330,23 @@ def draw_end_screen(status, score):
 
 
 def refresh():
+    """
+    刷新并重新初始化全局迷宫环境。这包括生成新的随机迷宫大小、重置迷宫布局、入口和出口点、陷阱机会以及任何相关的解迷宫线程，并为解迷宫过程计时。
+    以及为迷宫解谜过程计时的相关线程。在初始化新线程之前，会安全停止用于解迷宫和计时的现有活动线程。
+    初始化新线程。如果之前已启用人工智能，则也会重置人工智能状态。
+
+    :global MAZE: 当前的迷宫网格。更新为新生成的随机迷宫布局。
+    :global SIZE: 当前迷宫的大小。随机决定。
+    :global ENTRANCE: 迷宫入口坐标。随新迷宫的生成而更新。
+    :global EXIT: 迷宫的出口坐标。随新迷宫的生成而更新。
+    :global SOLVE_THREAD: 负责解迷宫的线程。重置并开始使用新的迷宫设置。
+    :global TIME_THREAD: 负责跟踪和计算所耗时间的线程。如果激活，则在停止前一个线程后重置并重新初始化。
+    :global AI: 是否启用人工智能辅助。如果当前已启用，则自动重置。
+    :global TRAP_CHANCES: 在迷宫中放置陷阱的剩余机会。在刷新过程中重置。
+
+    :return: None
+    :rtype: None
+    """
     global MAZE, SIZE, ENTRANCE, EXIT, SOLVE_THREAD, TIME_THREAD, AI, TRAP_CHANCES
     if SOLVE_THREAD is not None and SOLVE_THREAD.is_alive():
         stop_thread(SOLVE_THREAD)
@@ -338,6 +368,16 @@ def refresh():
 
 
 def draw_menu():
+    """
+    绘制带有可选难度选项的游戏主菜单。
+
+    该函数初始化并验证用于存储最高分的高分文件
+    如果该文件不存在，则会以默认值创建一个文件。然后准备并渲染游戏的主菜单屏幕，其中包含可选择的难度级别。为用户交互配置按钮状态和位置交互。
+
+    :raises OSError: 如果高分文件或目录因权限或其他操作系统级问题而无法创建或访问权限或其他操作系统层面的问题而无法创建或访问。
+    :return: None
+    :rtype: None
+    """
     # check for high score file
     try:
         f = open("assets/high_score.txt", "r+")
@@ -395,6 +435,13 @@ def draw_menu():
 
 
 def easy():
+    """
+    初始化全局变量，以设置 "简易 "级别。此函数设置全局变量 `r1`、`r2` 和 `level_select` 的值。level_select "的值，以配置 "简易 "关卡模式的设置。
+    初始化完成后，它将调用 `refresh` 函数来最终完成设置过程。
+
+    :return: None
+    :rtype: None
+    """
     global r1
     global r2
     global level_select
@@ -405,6 +452,17 @@ def easy():
 
 
 def medium():
+    """
+    将全局变量调整为中等难度。
+
+    此函数将全局变量 `r1`、`r2` 和 `level_select` 设置为与中等难度级别相对应的特定值。设置为与中等难度级别相对应的特定值。然后调用刷新 "函数来应用这些设置。
+
+    :raises NameError: 如果 "刷新 "函数未定义或不可访问。
+    :raises TypeError: 如果 `level_select` 被错误访问或更改。
+
+    :return: None
+    :rtype: None
+    """
     global r1
     global r2
     global level_select
@@ -415,6 +473,16 @@ def medium():
 
 
 def hard():
+    """
+    设置全局变量，将游戏配置为 "困难 "难度。
+
+    此函数通过更新变量 `r1`、`r2` 和`level_select` 变量来定义 "Hard "难度级别的参数。全局 然后调用全局 `refresh` 函数来应用这些更改。
+
+    :raises NameError: 如果未定义所需的全局变量或 `refresh` 函数未定义。
+
+    :return: None
+    :rtype: None
+    """
     global r1
     global r2
     global level_select
@@ -425,6 +493,15 @@ def hard():
 
 
 def display_high_score():
+    """
+    从与当前游戏难度相对应的文件中读取并返回高分。难度。高分是根据全局变量 `r1` 的值检索的。
+    变量的值来获取高分，该变量决定了游戏的难度级别：5 分代表简单，10 分代表中等，15 分代表困难、
+    15 为困难。如果在文件读取过程中出现任何错误，默认情况下会返回字符串 "0"。
+    返回字符串 "0"。
+
+    :return: 当前难度下记录的最高分，如果出现错误则为 "0"。
+    :rtype: str
+    """
     global r1
     try:
         f = open("assets/high_score.txt", "r")
@@ -441,19 +518,29 @@ def display_high_score():
 
 
 def msec_to_time(msec):
+    """
+    将毫秒转换为格式为 MM:SS 的时间字符串。
+
+    该函数接收以毫秒为单位的输入，并将其转换为以标准 MM:SS 格式表示时间长度的字符串。它确保分钟和秒钟都正确归零到两位数。
+
+    :param msec: 输入持续时间（毫秒）。
+    :type msec: int
+    :return: 以 MM:SS 格式表示持续时间的字符串。
+    :rtype: str
+    """
     sec = msec // 100
     min, sec = divmod(sec, 60)
     min_str = ''
     sec_str = ''
     if min == 0:
         min_str = '00'
-    elif min > 0 and min < 10:
+    elif 0 < min < 10:
         min_str = '0' + str(min)
     else:
         min_str = str(min)
     if sec == 0:
         sec_str = '00'
-    elif sec > 0 and sec < 10:
+    elif 0 < sec < 10:
         sec_str = '0' + str(sec)
     else:
         sec_str = str(sec)
@@ -461,6 +548,17 @@ def msec_to_time(msec):
 
 
 def display_time(curr_time, score):
+    """
+    在屏幕上渲染并显示当前分数和时间。该功能在保持视觉结构（如按钮屏幕上的特定区域更新分数和转换后的时间值，同时保持视觉结构，如按钮和标题，以提高清晰度。
+    和标题等视觉结构，以确保清晰度。它还会刷新显示屏，以确保更新可见。
+
+    :param curr_time: 以毫秒为单位转换并显示在屏幕上的时间量。
+    :type curr_time: int
+    :param score: 屏幕上显示的当前分数。
+    :type score: int
+    :return: None
+    :rtype: None
+    """
     global SCREEN
     if AI: Score = 1000
     SCREEN.fill(COLOR_WHITE, (2, HEIGHT - BOTTOM, WIDTH // 3, BOTTOM - 4))
@@ -473,6 +571,21 @@ def display_time(curr_time, score):
 
 
 def draw_maze(maze, cur_pos, score, time):
+    """
+    在屏幕上绘制迷宫以及当前玩家的位置、得分、时间和用户界面元素。
+
+    该函数负责渲染迷宫网格、玩家头像、用户界面按钮、标题、分数和游戏状态
+    指示器。它还会根据游戏状态调整按钮和显示行为，如人工智能算法模式
+    (如 BFS、A*）或手动模式下留下的陷阱机会。
+
+    :param maze: 以 2D 单元列表或网格的形式表示，其中每个单元都有一个定义其状态的特定类型（如墙壁、可穿越、陷阱等）。(如墙、可穿越、陷阱等）。
+    :param cur_pos: 玩家在迷宫中的当前位置。通常是一个列表，其中第一个元素表示方向，后面的元素则定义了 X 和 Y 坐标。
+    :param score:代表玩家当前得分的整数。
+    :param time: 游戏耗时（毫秒）。
+
+    :return: None
+    :rtype: None
+    """
     global level_select, CURRENT_DIRECTION, TRAP_CHANCES, ALGORITHM
     SCREEN.fill(COLOR_WHITE)
     draw_back_button()
@@ -569,14 +682,14 @@ def draw_maze(maze, cur_pos, score, time):
 
     # 替换AI按钮为BFS按钮，并添加A*按钮
     draw_button(2 + 2 * (WIDTH // 3), HEIGHT - BOTTOM, WIDTH // 6, BOTTOM - 4, 'BFS')
-    if (AI and ALGORITHM == "BFS"):
+    if AI and ALGORITHM == "BFS":
         draw_heading2(12 + 2 * (WIDTH // 3), HEIGHT - BOTTOM + 20, WIDTH // 6, 'ON')
     else:
         draw_heading2(12 + 2 * (WIDTH // 3), HEIGHT - BOTTOM + 20, WIDTH // 6, 'OFF')
 
     # 添加A*按钮
     draw_button(2 + 2 * (WIDTH // 3) + WIDTH // 6, HEIGHT - BOTTOM, WIDTH // 6, BOTTOM - 4, 'A*')
-    if (AI and ALGORITHM == "ASTAR"):
+    if AI and ALGORITHM == "ASTAR":
         draw_heading2(12 + 2 * (WIDTH // 3) + WIDTH // 6, HEIGHT - BOTTOM + 20, WIDTH // 6, 'ON')
     else:
         draw_heading2(12 + 2 * (WIDTH // 3) + WIDTH // 6, HEIGHT - BOTTOM + 20, WIDTH // 6, 'OFF')
@@ -605,6 +718,13 @@ def draw_maze(maze, cur_pos, score, time):
 
 
 def bfs_toggle():
+    """
+    切换迷宫解法应用程序的广度优先搜索（BFS）算法。
+    全局状态决定是否启用或禁用 BFS，该函数将重置必要的变量、清理当前迷宫并在适当情况下启动解迷宫线程。
+    必要的变量，清理当前迷宫，并在适当时启动解迷宫线程。
+
+    :raises RuntimeError: 如果求解线程无法正常停止，则发生该事件。
+    """
     global AI, SOLVE_THREAD, ALGORITHM, MAZE, ENTRANCE, EXIT
     AI = not (AI and ALGORITHM == "BFS")  # 如果BFS已开启则关闭，否则开启
     ALGORITHM = "BFS"  # 设置算法为BFS
@@ -631,6 +751,16 @@ def bfs_toggle():
 
 
 def astar_toggle():
+    """
+    切换解迷宫的 A* 算法并管理其线程执行。使用 A* 算法交替人工智能的状态，重置特定迷宫状态，并启动解迷宫线程，同时确保正确处理现有线程。
+    同时确保现有线程得到妥善处理。
+
+    :return: None
+    :rtype: None
+
+    :raises AttributeError: 如果某些全局变量（如 AI、ALGORITHM 或 MAZE）定义错误或丢失，则会引发定义不正确或丢失时会引发。
+    :raises TypeError: 当更新迷宫起始位置时，如果 ENTRANCE 或 EXIT 参数的格式与预期不符，则会发生该事件。
+    """
     global AI, SOLVE_THREAD, ALGORITHM, MAZE, ENTRANCE, EXIT
     AI = not (AI and ALGORITHM == "ASTAR")  # 如果A*已开启则关闭，否则开启
     ALGORITHM = "ASTAR"  # 设置算法为A*

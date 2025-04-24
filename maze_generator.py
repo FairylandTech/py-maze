@@ -39,6 +39,24 @@ class Maze:
 
 
 def check_neighbors(maze, x, y, width, height, checklist):
+    """
+    检查迷宫中给定单元格的邻近单元格，并确定是否有任何单元格可以访问 如果找到有效的相邻单元格，函数就会更新迷宫，并将路径移动到选定的相邻单元格。
+
+    :param maze: 代表迷宫结构，其中的单元格会根据路径探索情况进行修改。的单元格。提供`visited`等方法检查单元格是否被访问，以及`set_maze`等方法更新单元格状态。和 `set_maze` 等方法来更新单元格状态。
+    :type maze: Maze
+    :param x: 被评估单元格的当前 x 坐标。
+    :type x: int
+    :param y: 正在评估的单元格的当前 y 坐标。
+    :type y: int
+    :param width: 迷宫网格中的列总数。
+    :type width: int
+    :param height: 迷宫网格的总行数。
+    :type height: int
+    :param checklist: 在迷宫生成过程中需要处理的跟踪单元格列表在迷宫生成过程中需要处理的
+    :type checklist: list[tuple[int, int]]
+    :return: 布尔值，表示是否成功访问并修改了相邻单元格作为迷宫路径的一部分。作为迷宫路径的一部分被访问和修改。
+    :rtype: bool
+    """
     directions = []
     if x > 0:
         if not maze.visited(2 * (x - 1) + 1, 2 * y + 1):
@@ -75,6 +93,21 @@ def check_neighbors(maze, x, y, width, height, checklist):
 
 
 def random_prime(map, width, height):
+    """
+    使用随机普里姆算法生成随机迷宫。
+
+    这个函数使用一个实现在给定的地图上创建一个随机迷宫 普里姆算法。
+    它首先在中随机选择一个起点并通过将相应的单元格标记为路。从那一点开始，它通过随机选择和迭代地扩展迷宫
+    处理清单中的单元格，直到清单为空。
+
+    :param map: 生成迷宫的地图对象。它应该方法 "set_maze(x, y, cell_type)"，用于修改指定坐标处的单元格类型。
+    :param width: 用于边界检查的地图宽度。
+    :type width: int
+    :param height: 用于边界检查的地图高度。
+    :type height: int
+    :return: None
+    :rtype: None
+    """
     start_x, start_y = (randint(0, width - 1), randint(0, height - 1))
     map.set_maze(2 * start_x + 1, 2 * start_y + 1, CellType.ROAD)
     checklist = [(start_x, start_y)]
